@@ -49,3 +49,85 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+
+/* Ensure QuickGrid is full width */
+.quickgrid {
+    width: 100%;
+    max-width: 1200px; /* Adjust as needed */
+    margin: 20px auto; /* Center it */
+}
+
+    /* Improve table appearance */
+    .quickgrid table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .quickgrid th, .quickgrid td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: left;
+        font-size: 16px;
+    }
+
+    .quickgrid th {
+        background-color: #007bff;
+        color: white;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    /* Make buttons look clean */
+    .quickgrid button {
+        padding: 8px 12px;
+        font-size: 14px;
+        font-weight: 600;
+        border-radius: 5px;
+        transition: all 0.2s ease-in-out;
+    }
+
+    /* Consistent button styling */
+    .quickgrid .btn-outline-danger {
+        color: #dc3545;
+        border: 1px solid #dc3545;
+    }
+
+        .quickgrid .btn-outline-danger:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+
+    .quickgrid .btn-outline-success {
+        color: #28a745;
+        border: 1px solid #28a745;
+    }
+
+        .quickgrid .btn-outline-success:hover {
+            background-color: #28a745;
+            color: white;
+        }
+
+    .quickgrid .btn-outline-primary {
+        color: #007bff;
+        border: 1px solid #007bff;
+    }
+
+        .quickgrid .btn-outline-primary:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+    /* Space out buttons at the top */
+    .quickgrid button, .quickgrid a {
+        margin: 4px;
+    }
+
+/* Improve spacing around the grid */
+.quickgrid-container {
+    padding: 20px;
+}
+

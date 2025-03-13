@@ -1,30 +1,97 @@
-﻿@if(server != null)
-{
+﻿@inject NavigationManager NavigationManager
 
-        <div style="color:@(server.IsOnline?"green":"red")">
-            @server.Name is in @server.City is @(server.IsOnline ? "online" : "offline")
+@if (Server != null)
+{
+    <tr style="background-color: @GetBackgroundColor()">
+        <td>
+            @Server.Name
+        </td>
+        <td>
+            @Server.City
+        </td>
+        <td style="color:@((Server.IsOnline ? "green" : "red"))">
+            @(Server.IsOnline ? "online" : "offline")
+        </td>
+        <td>
+            @if (Server.IsOnline)
+            {
+                Random random = new Random();
+                int randomNumber = random.Next(0, 500);
+                <text>@randomNumber</text>
+            }
+            else
+            {
+                <text>N/A</text>
+            }
+        </td>
+        <td>
+            @if (Server.IsOnline)
+            {
+                <button type="button"
+                        class="btn btn-outline-danger"
+                        @onclick="@(()=> {Server.IsOnline = false;})">
+                    Turn Off
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-outline-success"
+                        @onclick="@(()=> {Server.IsOnline = true;})">
+                    Turn On
+                </button>
+            }
             &nbsp;
-            <button type="button" class="btn btn-primary"
-                @onclick="ChangeStatus">
-            Turn On / Off
-        </button>
-        </div>
-  
+            <a href="/servers/@Server.ServerId" class="btn btn-outline-primary">Edit</a>
+
+        </td>
+        <td>
+            <EditForm Model="Server"
+                      FormName="@($"form-Server-{Server.ServerId}")"
+                      OnValidSubmit="@(() => { DeleteServer(Server.ServerId); })">
+                <button type="submit" class="btn btn-primary">Delete</button>
+            </EditForm>
+        </td>
+    </tr>
 }
 
 
 @code {
 
+    [Parameter]
+    public Server? Server { get; set; }
 
-    private Server? server = new Server { Name = "Server 1", City = "Toronto" };
+    [CascadingParameter(Name = "SelectedCity")]
+    public string? SelectedCity { get; set; }
 
-    private void ChangeStatus()
+    private void DeleteServer(int serverId)
     {
-        if(server != null)
+        if (serverId > 0)
         {
-            this.server.IsOnline = !this.server.IsOnline;
+            ServersRepository.DeleteServer(serverId);
+            NavigationManager.NavigateTo("/servers", true);
         }
-       
     }
 
+    private string GetBackgroundColor()
+    {
+        if (SelectedCity != null)
+        {
+            switch (this.SelectedCity)
+            {
+                case "Toronto": return "powderblue";
+                case "Montreal": return "lightgray";
+                case "Ottawa": return "palegreen";
+                case "Calgary": return "pink";
+                case "Halifax": return "white";
+                default:
+                    return "white";
+            }
+        }
+        else
+        {
+            return "white";
+        }
+
+    }
 }
