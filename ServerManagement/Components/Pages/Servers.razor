@@ -2,13 +2,14 @@
 @page "/servers/back_from/{cityName}"
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
+@inject IServersEFCoreRepository ServersEFCoreRepository
 
 <h3>Servers</h3>
 
 <CitlyListComponent
-    @ref="cityListComponent"
-    SelectCityCallback="HandleCitySelection"
-    selectedCity="@this.selectedCity" />
+@ref="cityListComponent"
+SelectCityCallback="HandleCitySelection"
+selectedCity="@this.selectedCity" />
 
 <br />
 <SearchBarComponent @ref="searchBarComponent" SearchServerCallback="HandleSearchServer" style="width: 1000px"/>
@@ -16,10 +17,10 @@
 <br/>
 <CascadingValue Name="SelectedCity" Value="@selectedCity">
     <ServerListComponent
-        @rendermode="InteractiveServer"
-        CityName="@this.selectedCity"
-        SearchFilter="@this.searchFilter"
-        />
+    @rendermode="InteractiveServer"
+    CityName="@this.selectedCity"
+    SearchFilter="@this.searchFilter"
+    />
 </CascadingValue>
 <p>
     <a href="/servers/add" class="btn btn-primary">Add Server</a>
@@ -30,12 +31,11 @@
 @code {
     [Parameter]
     public string? CityName { get; set; }
-    private List<Server> servers = ServersRepository.GetServersByCity("Toronto");
+    private List<Server>? servers;
     private string selectedCity = "Toronto";
     private string searchFilter = "";
     private CitlyListComponent? cityListComponent;
     private SearchBarComponent? searchBarComponent;
-
 
     private void HandleCitySelection(string cityName)
     {
@@ -54,6 +54,7 @@
     {
         if (firstRender)
         {
+            servers = ServersEFCoreRepository.GetServersByCity("Toronto");
             if (NavigationManager.Uri.Contains("back_from") && !string.IsNullOrWhiteSpace(CityName))
             {
                 selectedCity = CityName;

@@ -1,4 +1,5 @@
 ﻿@inject NavigationManager NavigationManager
+@inject IServersEFCoreRepository ServersEFCoreRepository
 
 @if (Server != null)
 {
@@ -28,16 +29,16 @@
             @if (Server.IsOnline)
             {
                 <button type="button"
-                        class="btn btn-outline-danger"
-                        @onclick="@(()=> {Server.IsOnline = false;})">
+                class="btn btn-outline-danger"
+                @onclick="TurnOffServer">
                     Turn Off
                 </button>
             }
             else
             {
                 <button type="button"
-                        class="btn btn-outline-success"
-                        @onclick="@(()=> {Server.IsOnline = true;})">
+                class="btn btn-outline-success"
+                @onclick="TurnOnServer" >
                     Turn On
                 </button>
             }
@@ -47,8 +48,8 @@
         </td>
         <td>
             <EditForm Model="Server"
-                      FormName="@($"form-Server-{Server.ServerId}")"
-                      OnValidSubmit="@(() => { DeleteServer(Server.ServerId); })">
+            FormName="@($"form-Server-{Server.ServerId}")"
+            OnValidSubmit="@(() => { DeleteServer(Server.ServerId); })">
                 <button type="submit" class="btn btn-primary">Delete</button>
             </EditForm>
         </td>
@@ -68,8 +69,27 @@
     {
         if (serverId > 0)
         {
-            ServersRepository.DeleteServer(serverId);
+            ServersEFCoreRepository.DeleteServer(serverId);
             NavigationManager.NavigateTo("/servers", true);
+        }
+    }
+
+    private void TurnOffServer()
+    {
+        if(Server != null)
+        {
+            Server.IsOnline = false;
+            ServersEFCoreRepository.UpdateServer(Server.ServerId, Server);
+        }
+        
+    }
+
+    private void TurnOnServer()
+    {
+        if (Server != null)
+        {
+            Server.IsOnline = true;
+            ServersEFCoreRepository.UpdateServer(Server.ServerId, Server);
         }
     }
 
