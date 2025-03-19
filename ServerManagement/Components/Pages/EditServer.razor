@@ -4,6 +4,13 @@
 
 @inject NavigationManager NavigationManager
 
+@inject IJSRuntime JSRuntime
+
+<NavigationLock
+    OnBeforeInternalNavigation="OnBeforeInternalNavigation"
+    ConfirmExternalNavigation="true" />
+
+
 <h3>Edit Server</h3>
 <br/>
 <br />
@@ -44,7 +51,7 @@
         <br />
         <button class="btn btn-primary" type="submit">Update</button>
         &nbsp;
-        <a href="/servers" class="btn btn-primary">Close</a>
+        <a href="/servers" class="btn btn-primary" @onclick="Close">Close</a>
     </EditForm>
 }
 
@@ -53,6 +60,8 @@
 
 
 @code {
+    private bool _isNavigationConfirmed = false;
+
     [Parameter]
     public int Id { get; set; }
 
@@ -71,8 +80,29 @@
         if (server != null)
         {
             ServersRepository.UpdateServer(server.ServerId, server);
-          
+
         }
+        _isNavigationConfirmed = true;
+        NavigationManager.NavigateTo($"/servers/back_from/{this.server?.City}");
+    }
+
+    private void Close()
+    {
+        _isNavigationConfirmed = true;
         NavigationManager.NavigateTo("/servers");
+    }
+
+
+    private async Task OnBeforeInternalNavigation(LocationChangingContext context)
+    {
+        if (_isNavigationConfirmed)
+        {
+            return; // Allow navigation without confirmation
+        }
+        var isConfirmed =  await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to leave this page?");
+        if (!isConfirmed)
+        {
+            context.PreventNavigation();
+        }
     }
 }
