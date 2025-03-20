@@ -1,6 +1,9 @@
+using Microsoft.EntityFrameworkCore;
+using System;
 using WebAssemblyDemo.Client;
 using WebAssemblyDemo.Client.Pages;
 using WebAssemblyDemo.Components;
+using WebAssemblyDemo.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +12,14 @@ builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddControllers();
+
 builder.Services.AddSingleton<ContainerStorage>();
+
+builder.Services.AddDbContext<DataContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
@@ -29,6 +39,8 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+
+app.MapControllers();
 
 app.MapRazorComponents<App>()
     .AddInteractiveWebAssemblyRenderMode()

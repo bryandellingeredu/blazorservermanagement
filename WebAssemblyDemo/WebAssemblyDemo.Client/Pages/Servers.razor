@@ -1,0 +1,101 @@
+﻿@page "/wasm/servers"
+@using WebAssemblyDemo.Client.Models
+
+@rendermode InteractiveWebAssembly
+
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+
+<h3>Servers</h3>
+<br />
+<br />
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                City
+            </th>
+            <th>
+                Status
+            </th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (listServers.Any())
+        {
+            foreach (var server in listServers)
+            {
+                @if (server is not null)
+                {
+                    <tr>
+                        <td>@server.Name</td>
+                        <td>@server.City</td>
+                        <td>@(server.IsOnline ? "Online" : "Offline")</td>
+                        <td><a class="btn btn-link" href="/wasm/servers/@server.ServerId">Edit</a></td>
+                        <td><button class="btn btn-link" @onclick="@(()=> { Delete(server.ServerId); })">Delete</button></td>
+                    </tr>
+                }
+            }
+        }
+    </tbody>
+</table>
+<br />
+<a class="btn btn-primary" href="/wasm/servers/add">Add Server</a>
+
+@code {
+    public List<Server> listServers { get; set; } = new List<Server>();
+
+  /* protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            listServers = ServersRepository.GetServers();
+            StateHasChanged();
+    }
+    }*/
+
+    protected override async Task OnInitializedAsync()
+        {
+            await LoadServers();
+        }
+
+        private async Task LoadServers()
+        {
+            try
+            {
+    listServers = await Http.GetFromJsonAsync<List<Server>>("api/servers") ?? new List<Server>();
+            }
+            catch (Exception ex)
+            {
+    Console.WriteLine($"Error loading servers: {ex.Message}");
+    listServers = new List<Server>();
+            }
+        }
+
+    private async Task Delete(int serverId)
+    {
+        try
+       {
+    var response = await Http.DeleteAsync($"api/servers/{serverId}");
+    if (response.IsSuccessStatusCode)
+    {
+        listServers.RemoveAll(s => s.ServerId == serverId);
+        StateHasChanged();
+    }
+          else
+          {
+            Console.WriteLine($"Failed to delete server. Status Code: {response.StatusCode}");
+            }
+         }
+         catch (Exception ex)
+            {
+              Console.WriteLine($"Error deleting server: {ex.Message}");
+            }
+    }
+}         
